@@ -1,0 +1,17 @@
+﻿<Page
+    x:Class="MullenStudio.ADT_UWP.SignInPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MullenStudio.ADT_UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel>
+            <TextBox x:Name="UserNameTextBox" PlaceholderText="UserName" IsSpellCheckEnabled="False" InputScope="EmailNameOrAddress"/>
+            <PasswordBox x:Name="PasswordTextBox" PlaceholderText="Password"/>
+            <Button Content="Sign In" Click="SignInButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

@@ -1,0 +1,68 @@
+﻿<Page
+    x:Class="MullenStudio.ADT_UWP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MullenStudio.ADT_UWP"
+    xmlns:models="using:MullenStudio.ADT_UWP.Models"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" Loaded="Page_Loaded">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <RelativePanel>
+            <Button x:Name="SignOutButton" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignTopWithPanel="True" Click="SignOutButton_Click">
+                <SymbolIcon Symbol="Account"/>
+            </Button>
+            <TextBlock Text="ADT Home Security Client" RelativePanel.RightOf="SignOutButton" RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignBottomWithPanel="True" VerticalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}" Margin="20,0,0,0"/>
+            <Button x:Name="RefreshButton" RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignRightWithPanel="True" Click="RefreshButton_Click">
+                <SymbolIcon Symbol="Refresh"/>
+            </Button>
+        </RelativePanel>
+        <GridView Grid.Row="1">
+            <GridViewItem>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Image Source="{x:Bind AdtStatus.SummaryIcon}" Stretch="None"/>
+                    <StackPanel Grid.Row="1">
+                        <TextBlock Text="{x:Bind AdtStatus.CurrentArm}"/>
+                        <TextBlock Text="{x:Bind AdtStatus.CurrentMode}"/>
+                    </StackPanel>
+                </Grid>
+            </GridViewItem>
+            <GridViewItem>
+                <ListView ItemsSource="{x:Bind AdtStatus.ArmOptions}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ArmOption">
+                            <Button Content="{x:Bind DisplayValue}" DataContext="{x:Bind Value}" Click="ArmButton_Click"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </GridViewItem>
+            <GridViewItem>
+                <ListView ItemsSource="{x:Bind AdtStatus.ModeOptions}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ModeOption">
+                            <Button Content="{x:Bind DisplayValue}" DataContext="{x:Bind Value}" Click="ModeButton_Click"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </GridViewItem>
+            <GridViewItem>
+                <ListView ItemsSource="{x:Bind AdtStatus.Log}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </GridViewItem>
+        </GridView>
+    </Grid>
+</Page>
