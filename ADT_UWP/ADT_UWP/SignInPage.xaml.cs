@@ -6,7 +6,6 @@
 
 namespace MullenStudio.ADT_UWP
 {
-    using Windows.Storage;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
 
@@ -30,10 +29,9 @@ namespace MullenStudio.ADT_UWP
         /// <param name="e">Details about the event.</param>
         private void SignInButton_Click(object sender, RoutedEventArgs e)
         {
-            var settings = ApplicationData.Current.LocalSettings;
-            settings.Values["UserName"] = UserNameTextBox.Text;
-            // TODO: password is saved without encryption, should have at least simple encryption.
-            settings.Values["Password"] = PasswordTextBox.Password;
+            var passwordVault = (App.Current as App).Password;
+            passwordVault.ClearAllPasswords();
+            passwordVault.Add(new Windows.Security.Credentials.PasswordCredential("ADT", UserNameTextBox.Text, PasswordTextBox.Password));
             this.Frame.Navigate(typeof(MainPage));
         }
     }

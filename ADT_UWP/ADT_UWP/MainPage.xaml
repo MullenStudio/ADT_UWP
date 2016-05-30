@@ -15,47 +15,96 @@
         </Grid.RowDefinitions>
         <RelativePanel>
             <Button x:Name="SignOutButton" RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignTopWithPanel="True" Click="SignOutButton_Click">
-                <SymbolIcon Symbol="Account"/>
+                <SymbolIcon Symbol="Cancel"/>
             </Button>
             <TextBlock Text="ADT Home Security Client" RelativePanel.RightOf="SignOutButton" RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignBottomWithPanel="True" VerticalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}" Margin="20,0,0,0"/>
+            <Button x:Name="WebButton" RelativePanel.LeftOf="RefreshButton" RelativePanel.AlignTopWithPanel="True" Click="WebButton_Click">
+                <SymbolIcon Symbol="Go"/>
+            </Button>
             <Button x:Name="RefreshButton" RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignRightWithPanel="True" Click="RefreshButton_Click">
                 <SymbolIcon Symbol="Refresh"/>
             </Button>
         </RelativePanel>
-        <GridView Grid.Row="1">
+        <GridView Grid.Row="1" SizeChanged="GridView_SizeChanged">
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="GridViewItem">
+                                <Border BorderBrush="{TemplateBinding Foreground}" BorderThickness="1" Margin="10">
+                                    <ContentPresenter/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </GridView.ItemContainerStyle>
             <GridViewItem>
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Image Source="{x:Bind AdtStatus.SummaryIcon}" Stretch="None"/>
-                    <StackPanel Grid.Row="1">
-                        <TextBlock Text="{x:Bind AdtStatus.CurrentArm}"/>
-                        <TextBlock Text="{x:Bind AdtStatus.CurrentMode}"/>
+                    <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{x:Bind AdtStatus.CurrentArm}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{x:Bind AdtStatus.CurrentMode}" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
             </GridViewItem>
             <GridViewItem>
-                <ListView ItemsSource="{x:Bind AdtStatus.ArmOptions}">
+                <ListView ItemsSource="{x:Bind AdtStatus.ArmOptions}" ContainerContentChanging="ListView_ContainerContentChanging" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <ContentPresenter VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="models:ArmOption">
-                            <Button Content="{x:Bind DisplayValue}" DataContext="{x:Bind Value}" Click="ArmButton_Click"/>
+                            <Button Content="{x:Bind DisplayValue}" DataContext="{x:Bind Value}" Click="ArmButton_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
             </GridViewItem>
             <GridViewItem>
-                <ListView ItemsSource="{x:Bind AdtStatus.ModeOptions}">
+                <ListView ItemsSource="{x:Bind AdtStatus.ModeOptions}" ContainerContentChanging="ListView_ContainerContentChanging" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <ContentPresenter VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="models:ModeOption">
-                            <Button Content="{x:Bind DisplayValue}" DataContext="{x:Bind Value}" Click="ModeButton_Click"/>
+                            <Button Content="{x:Bind DisplayValue}" DataContext="{x:Bind Value}" Click="ModeButton_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
             </GridViewItem>
             <GridViewItem>
-                <ListView ItemsSource="{x:Bind AdtStatus.Log}">
+                <ListView ItemsSource="{x:Bind AdtStatus.Log}" ScrollViewer.HorizontalScrollBarVisibility="Auto" VerticalContentAlignment="Top">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <ContentPresenter VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Margin="20,0,0,0"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}"/>

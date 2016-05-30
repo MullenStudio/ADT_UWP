@@ -9,7 +9,7 @@ namespace MullenStudio.ADT_UWP
     using System;
     using Windows.ApplicationModel;
     using Windows.ApplicationModel.Activation;
-    using Windows.Storage;
+    using Windows.Security.Credentials;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Navigation;
@@ -27,6 +27,11 @@ namespace MullenStudio.ADT_UWP
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
         }
+
+        /// <summary>
+        /// Gets the password vault.
+        /// </summary>
+        public PasswordVault Password { get; private set; }
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -68,9 +73,8 @@ namespace MullenStudio.ADT_UWP
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    var settings = ApplicationData.Current.LocalSettings;
-                    if (settings.Values.ContainsKey("UserName") && !string.IsNullOrEmpty(settings.Values["UserName"] as string)
-                        && settings.Values.ContainsKey("Password") && !string.IsNullOrEmpty(settings.Values["Password"] as string))
+                    this.Password = new PasswordVault();
+                    if (this.Password.RetrieveAll().Count > 0)
                     {
                         rootFrame.Navigate(typeof(MainPage), e.Arguments);
                     }
