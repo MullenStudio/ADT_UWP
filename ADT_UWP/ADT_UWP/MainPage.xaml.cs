@@ -9,8 +9,10 @@ namespace MullenStudio.ADT_UWP
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+
     using MullenStudio.ADT_UWP.Models;
     using Windows.System;
+    using Windows.UI.Popups;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Media;
@@ -26,6 +28,10 @@ namespace MullenStudio.ADT_UWP
         public MainPage()
         {
             this.InitializeComponent();
+            Application.Current.Resuming += async (sender, e) =>
+            {
+                await this.RefreshAndUpdateUI();
+            };
             this.DataContext = new AdtStatus();
         }
 
@@ -44,9 +50,15 @@ namespace MullenStudio.ADT_UWP
         /// <param name="e">Details about the event.</param>
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            var passwordVault = (App.Current as App).Password;
-            var p = passwordVault.Retrieve();
-            await this.AdtStatus.Initialize(p.UserName, p.Password);
+            if (!await this.Initialize())
+            {
+                VisualStateManager.GoToState(this, "ErrorState", false);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, "NormalState", false);
+            }
+
             Bindings.Update();
         }
 
@@ -57,10 +69,21 @@ namespace MullenStudio.ADT_UWP
         /// <param name="e">Details about the event.</param>
         private async void SignOutButton_Click(object sender, RoutedEventArgs e)
         {
-            var passwordVault = (App.Current as App).Password;
-            passwordVault.ClearAllPasswords();
-            await AdtApi.Current.SignOut();
-            this.Frame.Navigate(typeof(SignInPage));
+            var messageDialog = new MessageDialog("Are you sure want to sign out? You need to input user name and password again to come back?");
+            messageDialog.Commands.Add(new UICommand(
+                "Yes",
+                new UICommandInvokedHandler(
+                async command =>
+                {
+                    var passwordVault = (App.Current as App).Password;
+                    passwordVault.ClearAllPasswords();
+                    await AdtApi.Current.SignOut();
+                    this.Frame.Navigate(typeof(SignInPage));
+                })));
+            messageDialog.Commands.Add(new UICommand("No"));
+            messageDialog.DefaultCommandIndex = 0;
+            messageDialog.CancelCommandIndex = 1;
+            await messageDialog.ShowAsync();
         }
 
         /// <summary>
@@ -80,8 +103,7 @@ namespace MullenStudio.ADT_UWP
         /// <param name="e">Details about the event.</param>
         private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            await this.AdtStatus.Refresh();
-            Bindings.Update();
+            await this.RefreshAndUpdateUI();
         }
 
         /// <summary>
@@ -148,6 +170,42 @@ namespace MullenStudio.ADT_UWP
                     (child as ListViewItem).Height = height;
                 }
             }
+        }
+
+        /// <summary>
+        /// Initializes by sign in and refresh the data.
+        /// </summary>
+        /// <returns>The task.</returns>
+        private async Task<bool> Initialize()
+        {
+            var passwordVault = (App.Current as App).Password;
+            var p = passwordVault.Retrieve();
+            return await this.AdtStatus.Initialize(p.UserName, p.Password);
+        }
+
+        /// <summary>
+        /// Refreshes and updates UI.
+        /// </summary>
+        /// <returns>The task.</returns>
+        private async Task RefreshAndUpdateUI()
+        {
+            bool success = true;
+            if (!await this.AdtStatus.Refresh())
+            {
+                // If refresh failed, initialize again.
+                success = await this.Initialize();
+            }
+
+            if (success)
+            {
+                VisualStateManager.GoToState(this, "NormalState", false);
+            }
+            else
+            {
+                VisualStateManager.GoToState(this, "ErrorState", false);
+            }
+
+            Bindings.Update();
         }
 
         /// <summary>

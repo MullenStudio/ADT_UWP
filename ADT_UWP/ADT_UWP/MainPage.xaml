@@ -9,6 +9,17 @@
     mc:Ignorable="d" Loaded="Page_Loaded">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="NormalState"/>
+                <VisualState x:Name="ErrorState">
+                    <VisualState.Setters>
+                        <Setter Target="NormalPanel.(UIElement.Visibility)" Value="Collapsed"/>
+                        <Setter Target="ErrorPanel.(UIElement.Visibility)" Value="Visible"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -25,7 +36,7 @@
                 <SymbolIcon Symbol="Refresh"/>
             </Button>
         </RelativePanel>
-        <GridView Grid.Row="1" SizeChanged="GridView_SizeChanged">
+        <GridView x:Name="NormalPanel" Grid.Row="1" SizeChanged="GridView_SizeChanged">
             <GridView.ItemContainerStyle>
                 <Style TargetType="GridViewItem">
                     <Setter Property="Template">
@@ -113,5 +124,6 @@
                 </ListView>
             </GridViewItem>
         </GridView>
+        <TextBlock x:Name="ErrorPanel" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">Failed to retrieve data from the server.<LineBreak/>&#8226; Wrong user name or password?<LineBreak/>&#8226; Bad Internect connection?<LineBreak/>&#8226; ADT server is down?<LineBreak/>&#8226; Try again later?</TextBlock>
     </Grid>
 </Page>

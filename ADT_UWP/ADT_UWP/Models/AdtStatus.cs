@@ -53,11 +53,15 @@ namespace MullenStudio.ADT_UWP.Models
         /// <param name="userName">The user name.</param>
         /// <param name="password">The password.</param>
         /// <returns>The task.</returns>
-        public async Task Initialize(string userName, string password)
+        public async Task<bool> Initialize(string userName, string password)
         {
             if (await AdtApi.Current.SignIn(userName, password))
             {
-                await this.Refresh();
+                return await this.Refresh();
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -65,7 +69,7 @@ namespace MullenStudio.ADT_UWP.Models
         /// Refreshes the ADT status.
         /// </summary>
         /// <returns>The task.</returns>
-        public async Task Refresh()
+        public async Task<bool> Refresh()
         {
             var summary = await AdtApi.Current.GetSummary();
             if (summary != null)
@@ -77,11 +81,15 @@ namespace MullenStudio.ADT_UWP.Models
                 }
                 catch (Exception)
                 {
-                    // Ignore
+                    return false;
                 }
 
                 this.CurrentArm = summary.Arm;
                 this.CurrentMode = summary.Mode;
+            }
+            else
+            {
+                return false;
             }
 
             var armOptions = (await AdtApi.Current.ListArmOptions())?.ToList();
@@ -90,12 +98,20 @@ namespace MullenStudio.ADT_UWP.Models
                 this.ArmOptions.Clear();
                 armOptions.ForEach(armOption => this.ArmOptions.Add(new ArmOption { Value = armOption.Key, DisplayValue = armOption.Value }));
             }
+            else
+            {
+                return false;
+            }
 
             var modeOptions = (await AdtApi.Current.ListModes())?.ToList();
             if (modeOptions != null)
             {
                 this.ModeOptions.Clear();
                 modeOptions.ForEach(modeOption => this.ModeOptions.Add(new ModeOption { Value = modeOption.Key, DisplayValue = modeOption.Value }));
+            }
+            else
+            {
+                return false;
             }
 
             var log = (await AdtApi.Current.GetLog())?.ToList();
@@ -104,6 +120,12 @@ namespace MullenStudio.ADT_UWP.Models
                 this.Log.Clear();
                 log.ForEach(record => this.Log.Add(record));
             }
+            else
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -29,6 +29,11 @@ namespace MullenStudio.ADT_UWP
         /// <param name="e">Details about the event.</param>
         private void SignInButton_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(UserNameTextBox.Text) || string.IsNullOrEmpty(PasswordTextBox.Password))
+            {
+                return;
+            }
+
             var passwordVault = (App.Current as App).Password;
             passwordVault.ClearAllPasswords();
             passwordVault.Add(new Windows.Security.Credentials.PasswordCredential("ADT", UserNameTextBox.Text, PasswordTextBox.Password));

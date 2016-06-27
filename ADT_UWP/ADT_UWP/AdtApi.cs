@@ -153,10 +153,17 @@ namespace MullenStudio.ADT_UWP
                 content.Add("keeploggedin", "YES");
             }
 
-            var response = await this.httpClient.PostAsync(
-                new Uri($"{AdtDomain}{SignInUrl}"), 
-                new HttpFormUrlEncodedContent(content));
-            return response.StatusCode == HttpStatusCode.Found;
+            try
+            {
+                var response = await this.httpClient.PostAsync(
+                    new Uri($"{AdtDomain}{SignInUrl}"),
+                    new HttpFormUrlEncodedContent(content));
+                return response.StatusCode == HttpStatusCode.Found;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -165,8 +172,15 @@ namespace MullenStudio.ADT_UWP
         /// <returns>True if sign out successfully.</returns>
         public async Task<bool> SignOut()
         {
-            var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{SignOutUrl}"));
-            return response.StatusCode == HttpStatusCode.Found;
+            try
+            {
+                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{SignOutUrl}"));
+                return response.StatusCode == HttpStatusCode.Found;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -175,8 +189,17 @@ namespace MullenStudio.ADT_UWP
         /// <returns>The summary. Null if failed to get the summary.</returns>
         public async Task<Summary> GetSummary()
         {
-            var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{SummaryUrl}"));
-            string html = await response.Content.ReadAsStringAsync();
+            string html;
+            try
+            {
+                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{SummaryUrl}"));
+                html = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
             try
             {
                 var doc = new HtmlDocument();
@@ -209,8 +232,17 @@ namespace MullenStudio.ADT_UWP
         /// <returns>The collection of arm options. The key is the value used as <see cref="SetArm(string)"/> parameter and the value is used for display. Null if failed to get current arm options.</returns>
         public async Task<IEnumerable<KeyValuePair<string, string>>> ListArmOptions()
         {
-            var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListArmUrl}"));
-            string html = await response.Content.ReadAsStringAsync();
+            string html;
+            try
+            {
+                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListArmUrl}"));
+                html = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
             try
             {
                 var doc = new HtmlDocument();
@@ -250,6 +282,10 @@ namespace MullenStudio.ADT_UWP
                     new HttpFormUrlEncodedContent(content));
                 return response.Headers.Location.AbsoluteUri.EndsWith(SetArmSuccessSuffix, StringComparison.OrdinalIgnoreCase);
             }
+            catch (Exception)
+            {
+                return false;
+            }
             finally
             {
                 this.httpClient.DefaultRequestHeaders.Referer = null;
@@ -262,8 +298,17 @@ namespace MullenStudio.ADT_UWP
         /// <returns>The collection of mode options. The key is the value used as <see cref="SetMode(int)"/> parameter and the value is used for display. Null if failed to get the mode options.</returns>
         public async Task<IEnumerable<KeyValuePair<int, string>>> ListModes()
         {
-            var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListModeUrl}"));
-            string html = await response.Content.ReadAsStringAsync();
+            string html;
+            try
+            {
+                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListModeUrl}"));
+                html = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
             try
             {
                 var doc = new HtmlDocument();
@@ -305,8 +350,17 @@ namespace MullenStudio.ADT_UWP
         /// <returns>The collection of log records. Null if failed to get the log.</returns>
         public async Task<IEnumerable<string>> GetLog()
         {
-            var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{LogUrl}"));
-            string html = await response.Content.ReadAsStringAsync();
+            string html;
+            try
+            {
+                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{LogUrl}"));
+                html = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
             try
             {
                 var doc = new HtmlDocument();
@@ -342,8 +396,17 @@ namespace MullenStudio.ADT_UWP
         /// <returns>The HTTP content.</returns>
         private async Task<Dictionary<string, string>> GetArmContent(string value)
         {
-            var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListArmUrl}"));
-            string html = await response.Content.ReadAsStringAsync();
+            string html;
+            try
+            {
+                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListArmUrl}"));
+                html = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
             try
             {
                 var doc = new HtmlDocument();
@@ -385,10 +448,17 @@ namespace MullenStudio.ADT_UWP
                 { "shiftModeId", $"{mode}" }
             };
 
-            var response = await this.httpClient.PostAsync(
-                new Uri($"{AdtDomain}{SetModeUrl}"),
-                new HttpFormUrlEncodedContent(content));
-            return response.Headers.Location.AbsoluteUri.EndsWith(SetModeSuccessSuffix, StringComparison.OrdinalIgnoreCase);
+            try
+            {
+                var response = await this.httpClient.PostAsync(
+                    new Uri($"{AdtDomain}{SetModeUrl}"),
+                    new HttpFormUrlEncodedContent(content));
+                return response.Headers.Location.AbsoluteUri.EndsWith(SetModeSuccessSuffix, StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         /// <summary>
