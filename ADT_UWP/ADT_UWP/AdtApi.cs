@@ -155,9 +155,7 @@ namespace MullenStudio.ADT_UWP
 
             try
             {
-                var response = await this.httpClient.PostAsync(
-                    new Uri($"{AdtDomain}{SignInUrl}"),
-                    new HttpFormUrlEncodedContent(content));
+                var response = await this.HttpPost($"{AdtDomain}{SignInUrl}", content);
                 return response.StatusCode == HttpStatusCode.Found;
             }
             catch (Exception)
@@ -174,7 +172,7 @@ namespace MullenStudio.ADT_UWP
         {
             try
             {
-                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{SignOutUrl}"));
+                var response = await this.HttpGet($"{AdtDomain}{SignOutUrl}");
                 return response.StatusCode == HttpStatusCode.Found;
             }
             catch (Exception)
@@ -192,7 +190,7 @@ namespace MullenStudio.ADT_UWP
             string html;
             try
             {
-                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{SummaryUrl}"));
+                var response = await this.HttpGet($"{AdtDomain}{SummaryUrl}");
                 html = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
@@ -235,7 +233,7 @@ namespace MullenStudio.ADT_UWP
             string html;
             try
             {
-                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListArmUrl}"));
+                var response = await this.HttpGet($"{AdtDomain}{ListArmUrl}");
                 html = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
@@ -277,10 +275,10 @@ namespace MullenStudio.ADT_UWP
             try
             {
                 this.httpClient.DefaultRequestHeaders.Referer = new Uri($"{AdtDomain}{ListArmUrl}");
-                var response = await this.httpClient.PostAsync(
-                    new Uri($"{AdtDomain}{SetArmUrl}"),
-                    new HttpFormUrlEncodedContent(content));
-                return response.Headers.Location.AbsoluteUri.EndsWith(SetArmSuccessSuffix, StringComparison.OrdinalIgnoreCase);
+                var response = await this.HttpPost($"{AdtDomain}{SetArmUrl}", content);
+                return response.Headers.Location.AbsoluteUri.EndsWith(
+                    SetArmSuccessSuffix,
+                    StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception)
             {
@@ -301,7 +299,7 @@ namespace MullenStudio.ADT_UWP
             string html;
             try
             {
-                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListModeUrl}"));
+                var response = await this.HttpGet($"{AdtDomain}{ListModeUrl}");
                 html = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
@@ -353,7 +351,7 @@ namespace MullenStudio.ADT_UWP
             string html;
             try
             {
-                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{LogUrl}"));
+                var response = await this.HttpGet($"{AdtDomain}{LogUrl}");
                 html = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
@@ -399,7 +397,7 @@ namespace MullenStudio.ADT_UWP
             string html;
             try
             {
-                var response = await this.httpClient.GetAsync(new Uri($"{AdtDomain}{ListArmUrl}"));
+                var response = await this.HttpGet($"{AdtDomain}{ListArmUrl}");
                 html = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
@@ -450,15 +448,62 @@ namespace MullenStudio.ADT_UWP
 
             try
             {
-                var response = await this.httpClient.PostAsync(
-                    new Uri($"{AdtDomain}{SetModeUrl}"),
-                    new HttpFormUrlEncodedContent(content));
-                return response.Headers.Location.AbsoluteUri.EndsWith(SetModeSuccessSuffix, StringComparison.OrdinalIgnoreCase);
+                var response = await this.HttpPost($"{AdtDomain}{SetModeUrl}", content);
+                return response.Headers.Location.AbsoluteUri.EndsWith(
+                    SetModeSuccessSuffix,
+                    StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception)
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Sends HTTP GET request.
+        /// </summary>
+        /// <param name="url">The URL.</param>
+        /// <returns>The response.</returns>
+        private async Task<HttpResponseMessage> HttpGet(string url)
+        {
+            Uri uri = new Uri(url);
+            do
+            {
+                var response = await this.httpClient.GetAsync(uri);
+                if (response.StatusCode == HttpStatusCode.TemporaryRedirect)
+                {
+                    uri = response.Headers.Location;
+                }
+                else
+                {
+                    return response;
+                }
+            }
+            while (true);
+        }
+
+        /// <summary>
+        /// Sends HTTP POST request.
+        /// </summary>
+        /// <param name="url">The URL.</param>
+        /// <param name="content">The content</param>
+        /// <returns>The response.</returns>
+        private async Task<HttpResponseMessage> HttpPost(string url, IEnumerable<KeyValuePair<string, string>> content)
+        {
+            Uri uri = new Uri(url);
+            do
+            {
+                var response = await this.httpClient.PostAsync(uri, new HttpFormUrlEncodedContent(content));
+                if (response.StatusCode == HttpStatusCode.TemporaryRedirect)
+                {
+                    uri = response.Headers.Location;
+                }
+                else
+                {
+                    return response;
+                }
+            }
+            while (true);
         }
 
         /// <summary>
